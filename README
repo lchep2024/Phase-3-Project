@@ -1,0 +1,340 @@
+H1N1 & SEASONAL FLU VACCINATION
+
+Dataset from Data Driven Competition
+
+Introduction.
+
+In response to the 2009 H1N1 influenza pandemic, the National 2009 H1N1 Flu Survey (NHFS) was conducted by the National Center for Immunization and Respiratory Diseases (NCIRD) and the National Center for Health Statistics (NCHS), part of the Centers for Disease Control and Prevention (CDC). This survey, carried out from October 2009 to June 2010, aimed to monitor vaccination coverage during a critical period of heightened public health concern.
+
+The NHFS utilized a comprehensive telephone survey approach to collect data from households across the United States, targeting individuals aged 6 months and older. The primary goal was to obtain precise estimates of vaccination rates for both the H1N1 monovalent vaccine and the seasonal flu vaccine, providing key insights into immunization trends during the 2009-2010 flu season.
+
+With the data provided by the NHFS, there is a valuable opportunity to develop predictive models that estimate the likelihood of individuals receiving both the H1N1 and seasonal flu vaccines. Such models can offer actionable insights to public health officials, enabling more targeted vaccination strategies and improved resource allocation. As we look to enhance future vaccination efforts, understanding the factors influencing vaccine uptake through predictive modeling becomes crucial for optimizing public health interventions.
+
+Problem Statement.
+
+Predicting Vaccination Likelihood for H1N1 and Seasonal Flu Based on NHFS Data
+
+Objective.
+
+To develop predictive models that estimate the probability of individuals receiving both the H1N1 and seasonal flu vaccines using data from the National 2009 H1N1 Flu Survey (NHFS). The models should provide separate probability estimates for each vaccine based on various demographic and behavioral features collected during the survey.
+
+Data Understanding.
+
+The survey targeted individuals aged 6 months and older across the United States, capturing a broad demographic range. This implies that the dataset includes diverse age groups and potentially various socio-economic and health-related factors.It also includes demographic details such as age, gender, income, and education. This information is crucial for understanding the distribution of vaccination rates among different population segments.Data Dictionary
+The first column respondent_id is a unique and random identifier. For all binary variables: 0 = No; 1 = Yes.
+ 
+Data Description
+
+h1n1_concern - Level of concern about the H1N1 flu. 0 = Not at all concerned; 1 = Not very concerned; 2 = Somewhat concerned; 3 = Very concerned.
+
+h1n1_knowledge - Level of knowledge about H1N1 flu. 0 = No knowledge; 1 = A little knowledge; 2 = A lot of knowledge.
+
+behavioral_antiviral_meds - Has taken antiviral medications. (binary)
+
+behavioral_avoidance - Has avoided close contact with others with flu-like symptoms. (binary) behavioral_face_mask - Has bought a face mask. (binary)
+
+behavioral_wash_hands - Has frequently washed hands or used hand sanitizer. (binary)
+
+behavioral_large_gatherings - Has reduced time at large gatherings. (binary)
+
+behavioral_outside_home - Has reduced contact with people outside of own household. (binary)
+
+behavioral_touch_face - Has avoided touching eyes, nose, or mouth. (binary)
+
+doctor_recc_h1n1 - H1N1 flu vaccine was recommended by doctor. (binary)
+
+doctor_recc_seasonal - Seasonal flu vaccine was recommended by doctor. (binary)
+
+chronic_med_condition - Has any of the following chronic medical conditions: asthma or an other lung condition, diabetes, a heart condition, a kidney condition, sickle cell anemia or other anemia, a neurological or neuromuscular condition, a liver condition, or a weakened immune system caused by a chronic illness or by medicines taken for a chronic illness. (binary)
+
+child_under_6_months- Has regular close contact with a child under the age of six months. (binary)
+
+health_worker- Is a healthcare worker. (binary)
+
+health_insurance- Has health insurance. (binary)
+
+opinion_h1n1_vacc_effective - Respondent's opinion about H1N1 vaccine effectiveness. 1 = Not at all effective; 2 = Not very effective; 3 = Don't know; 4 = Somewhat effective; 5 = Very effective.
+
+opinion_h1n1_risk - Respondent's opinion about risk of getting sick with H1N1 flu without vaccine. 1 = Very Low; 2 = Somewhat low; 3 = Don't know; 4 = Somewhat high; 5 = Very high.
+
+opinion_h1n1_sick_from_vacc - Respondent's worry of getting sick from taking H1N1 vaccine. 1 = Not at all worried; 2 = Not very worried; 3 = Don't know; 4 = Somewhat worried; 5 = Very worried.
+
+opinion_seas_vacc_effective - Respondent's opinion about seasonal flu vaccine effectiveness. 1 = Not at all effective; 2 = Not very effective; 3 = Don't know; 4 = Somewhat effective; 5 = Very effective.
+
+opinion_seas_risk - Respondent's opinion about risk of getting sick with seasonal flu without vaccine. 1 = Very Low; 2 = Somewhat low; 3 = Don't know; 4 = Somewhat high; 5 = Very high.
+
+opinion_seas_sick_from_vacc - Respondent's worry of getting sick from taking seasonal flu vaccine. 1 = Not at all worried; 2 = Not very worried; 3 = Don't know; 4 = Somewhat worried; 5 = Very worried.
+
+age_group - Age group of respondent.
+
+education - Self-reported education level.
+
+race - Race of respondent.
+
+sex- Sex of respondent.
+
+income_poverty - Household annual income of respondent with respect to 2008 Census poverty thresholds.
+
+marital_status - Marital status of respondent.
+
+rent_or_own - Housing situation of respondent.
+
+employment_status- Employment status of respondent.
+
+hhs_geo_region - Respondent's residence using a 10-region geographic classification defined by the U.S. Dept. of Health and Human Services. Values are represented as short random character strings.
+
+census_msa - Respondent's residence within metropolitan statistical areas (MSA) as defined by the U.S. Census.
+
+household_adults - Number of other adults in household, top-coded to 3.
+
+household_children - Number of children in household, top-coded to 3.
+
+employment_industry - Type of industry respondent is employed in. Values are represented as short random character strings.
+
+employment_occupation - Type of occupation of respondent. Values are represented as short random character strings.Healthcare Providers 
+
+targeted stakeholders
+
+(Doctors, Nurses, Clinics, Hospitals)
+
+These stakeholders will use the  predictive model to make informed decisions about patient care, prioritize resources, and manage patient outcomes.
+
+The predictive model can help healthcare providers identify patients at high risk for (e.g., flu & H1N1), leading to timely intervention through vaccination and better management of patient care.#handling class imbalance h1n1.
+
+modeling
+
+X1 = df1.loc[:, ~df1.columns.isin(['h1n1_vaccine', 'respondent_id'])]
+y1 = df1["h1n1_vaccine"]
+
+X1_train, X1_test, y1_train, y1_test = train_test_split(X1, y1, test_size=0.2)
+
+#applying SMOTE
+smote=SMOTE(random_state=42)
+X1_resampled,y1_resampled=smote.fit_resample(X1_train,y1_train)
+
+#scaling
+scaler = StandardScaler()  
+scaler.fit(X1_train)
+
+X1_train = scaler.transform(X1_train)
+X1_test = scaler.transform(X1_test)
+ 
+# Train a model for H1N1 vaccine
+model_h1n1 = LogisticRegression()
+model_h1n1.fit(X1_resampled, y1_resampled)
+
+# Make predictions for H1N1 vaccine
+y1_pred = model_h1n1.predict(X1_test)
+
+#Evaluate using confusion matrix for H1N1
+confusion_h1n1 = confusion_matrix(y1_test, y1_pred)
+print("Confusion Matrix for H1N1 Vaccine:")
+print(confusion_h1n1)
+
+
+# Classification report for H1N1
+print("Classification Report for H1N1 Vaccine:")
+print(classification_report(y1_test, y1_pred))
+
+Confusion Matrix for H1N1 Vaccine:
+[[2641 1526]
+ [ 220  955]]
+Classification Report for H1N1 Vaccine:
+              precision    recall  f1-score   support
+
+           0       0.92      0.63      0.75      4167
+           1       0.38      0.81      0.52      1175
+
+    accuracy                           0.67      5342
+   macro avg       0.65      0.72      0.64      5342
+weighted avg       0.80      0.67      0.70      5342
+
+The overall accuracy is 67% reflecting the balance between identifying both classes correctly.
+after applying smote the recall for the minority class improved significantly 0.83 but the precision dropped to 0.39 meaning there more false positives.
+
+#plotting confusion matrix for h1n1
+plt.figure(figsize=(8,6))
+sns.heatmap(confusion_h1n1,annot=True,fmt='d',cmap='Blues',cbar=False,xticklabels=['No h1n1','h1n1 Vaccine'],yticklabels=['No h1n1','h1n1 Vaccine'])
+plt.ylabel('Actual')
+plt.xlabel('Predicted')
+plt.title('confusion Matrix FOR H1N1 After SMOTE')
+plt.show()
+
+#train for seasonal vaccine.
+model_seasonal = LogisticRegression()
+model_seasonal.fit(X2_train, y2_train)
+
+# Make predictions for Seasonal Flu vaccine
+y2_pred = model_seasonal.predict(X2_test)
+
+# Evaluate using confusion matrix for Seasonal Flu vaccine
+confusion_seasonal = confusion_matrix(y2_test, y2_pred)
+print("Confusion Matrix for Seasonal Flu Vaccine:")
+print(confusion_seasonal)
+
+# Classification report for Seasonal Flu vaccine
+print("Classification Report for Seasonal Flu Vaccine:")
+print(classification_report(y2_test, y2_pred))
+
+Confusion Matrix for Seasonal Flu Vaccine:
+[[2653  205]
+ [1532  952]]
+Classification Report for Seasonal Flu Vaccine:
+              precision    recall  f1-score   support
+
+           0       0.63      0.93      0.75      2858
+           1       0.82      0.38      0.52      2484
+
+    accuracy                           0.67      5342
+   macro avg       0.73      0.66      0.64      5342
+weighted avg       0.72      0.67      0.65      5342
+
+#plot ROC curve for both h1n1 and seasonal flu
+#h1n1
+y1_score= model_h1n1.predict_proba(X1_test)[:,1]
+
+fpr1,tpr1 , _ = roc_curve(y1_test,y1_score)
+
+roc_auc1 = auc(fpr1,tpr1)
+#seasonal flu
+y2_score= model_seasonal.predict_proba(X2_test)[:,1]
+
+fpr2,tpr2 , _ = roc_curve(y2_test,y2_score)
+
+roc_auc2 = auc(fpr2,tpr2)
+
+plt.figure(figsize=(10,6))
+plt.plot(fpr1,tpr1,color='green',label='h1n1 ROC CURVE(area={:.2f})'.format(roc_auc1))
+plt.plot(fpr2,tpr2,color='orange',label='seasonal Flu ROC Curve(area={:.2f})'.format(roc_auc2))
+plt.plot([0,1],[0,1],color='red',linestyle='--')
+plt.xlim([0.0,1.0])
+plt.ylim([0.0,1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc='lower right')
+plt.grid()
+plt.show()
+
+#K fold cross validation for h1n1 & seasonal flu
+h1n1_cv_scores=cross_val_score(model_h1n1,X1,y1,cv=5,scoring='accuracy')
+print("h1n1 vaccine cross_validation accuracy scores:",h1n1_cv_scores)
+print("Mean Accuracy for H1n1 vaccine:",h1n1_cv_scores.mean())
+
+seasonal_cv_scores=cross_val_score(model_seasonal,X2,y2,cv=5,scoring='accuracy')
+print("Seasonal flu Vaccine cross validation accuracy score",seasonal_cv_scores)
+print("Mean Accuracy for Seasonal Flu",seasonal_cv_scores.mean())
+
+h1n1 vaccine cross_validation accuracy scores: [0.78753276 0.78753276 0.78768021 0.78749298 0.78749298]
+Mean Accuracy for H1n1 vaccine: 0.787546337183354
+Seasonal flu Vaccine cross validation accuracy score [0.67296893 0.67708723 0.667478   0.67964801 0.67122262]
+Mean Accuracy for Seasonal Flu 0.673680956519051
+
+decision tree for h1n1
+model_h1n1_tree=DecisionTreeClassifier(random_state=42)
+model_h1n1_tree.fit(X1_train,y1_train)
+
+#decision tree for Flu
+model_seasonal_tree=DecisionTreeClassifier(random_state=42)
+model_seasonal_tree.fit(X2_train,y2_train)
+
+#plot the decision trees.
+plt.figure(figsize=(20,10))
+tree.plot_tree(model_h1n1_tree,feature_names=X1.columns,class_names=['No','Yes'],filled=True)
+plt.title('Decision Tree H1N1 Vaccine')
+plt.show()
+
+#decision tree for seasonal flu.
+plt.figure(figsize=(20,10))
+tree.plot_tree(model_seasonal_tree,feature_names=X2.columns,class_names=['No','Yes'],filled=True)
+plt.title('Decision Tree Seasonal Flu Vaccine')
+plt.show()
+
+#make predictions h1n1.
+
+y1_pred = model_h1n1_tree.predict(X1_test)
+y1_score=model_h1n1_tree.predict_proba(X1_test)[:,1]
+
+accuracy = accuracy_score(y1_test,y1_pred)
+
+precision= precision_score(y1_test,y1_pred)
+
+recall=recall_score(y1_test,y1_pred)
+
+f1= f1_score(y1_test,y1_pred)
+
+roc_auc1 =roc_auc_score(y1_test,y1_score)
+
+conf_matrix=confusion_matrix(y1_test,y1_pred)
+
+print(f"Accuracy:{accuracy:.4f}")
+print(f"precision:{precision:.4f}")
+print(f"Recall:{recall:.4f}")
+print(f"F1-score:{f1:.4f}")
+print(f"ROC-AUC:{roc_auc1:.4f}")
+print(f"Confusion Matrix:\n{conf_matrix}")
+
+Accuracy:0.7800
+precision:0.0000
+Recall:0.0000
+F1-score:0.0000
+ROC-AUC:0.7233
+Confusion Matrix:
+[[4167    0]
+ [1175    0]]
+
+ #Predictions for Seasonal flu
+y2_pred = model_seasonal_tree.predict(X2_test)
+y2_score=model_seasonal_tree.predict_proba(X2_test)[:,1]
+
+accuracy = accuracy_score(y2_test,y2_pred)
+
+precision= precision_score(y2_test,y2_pred)
+
+recall=recall_score(y2_test,y2_pred)
+
+f1= f1_score(y2_test,y2_pred)
+
+roc_auc1 =roc_auc_score(y2_test,y2_score)
+
+conf_matrix=confusion_matrix(y2_test,y2_pred)
+
+print(f"Accuracy:{accuracy:.4f}")
+print(f"precision:{precision:.4f}")
+print(f"Recall:{recall:.4f}")
+print(f"F1-score:{f1:.4f}")
+print(f"ROC-AUC:{roc_auc1:.4f}")
+print(f"Confusion Matrix:\n{conf_matrix}")
+Accuracy:0.6748
+precision:0.8228
+Recall:0.3833
+F1-score:0.5229
+ROC-AUC:0.6558
+Confusion Matrix:
+[[2653  205]
+ [1532  952]]
+
+ Conclusion
+
+The Logistic regression model performed well as opposed to the decision tree with an accuracy of 67% with a balance in precision,recall & f1 scores.
+
+Impact on decision making for a predictive health model.
+
+High Precision: If the model has high precision, it implies that the predictions made by the model are reliable, which can reduce unnecessary treatments and focus resources on patients who are truly at risk.
+
+High Recall: A model with high recall ensures that most patients who need attention are identified, potentially improving health outcomes by ensuring timely interventions.
+
+False Negatives: In health predictions, false negatives (missed positive cases) can be particularly detrimental. For example, failing to identify a patient with a serious condition can delay treatment and worsen outcomes.
+
+False Positives: While less critical, false positives (incorrectly predicting a condition) can lead to unnecessary testing and treatments, which can be costly and stressful for patients.
+
+Recommendation
+
+Address Class Imbalance: Implement techniques to handle class imbalance, such as resampling methods or using algorithms designed for imbalanced data.
+
+External Validation: Test the model on external datasets or in different healthcare settings to assess its performance in varied conditions.
+
+Continuous Monitoring: Once deployed, continuously monitor the model’s performance to ensure it remains accurate and effective over time.
+
+Feedback Loop: Incorporate feedback from healthcare professionals to refine and improve the model based on real-world performance and challenges.
+
